@@ -18,8 +18,26 @@
             background-color: #f5f5f5;
         }
 
-        #chat {
+        #container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             width: 80%;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+
+        #chatTitle {
+            margin-bottom: 20px;
+            font-size: 24px;
+            color: #333;
+            text-align: center;
+        }
+
+
+        #chat {
+            width: 100%;
             max-width: 800px;
             height: 60vh;
             border: 1px solid #ccc;
@@ -112,60 +130,62 @@
 
 <body>
 
-    <div id="chat"></div>
-    <div id="loading" class="spinner" style="display: none;"></div>
-    <form id="chatForm">
-        <input type="text" id="userInput" placeholder="Ask something..." autocomplete="off" required>
-        <button type="submit">Send</button>
-    </form>
+    <div id="container">
+        <h1 id="chatTitle">Simple chat</h1>
+        <div id="chat"></div>
+        <div id="loading" class="spinner" style="display: none;"></div>
+        <form id="chatForm">
+            <input type="text" id="userInput" placeholder="Ask something..." autocomplete="off" required>
+            <button type="submit">Send</button>
+        </form>
 
-    <script>
-        document.getElementById('chatForm').onsubmit = async function (event) {
-            event.preventDefault(); // Prevent the form from submitting in the traditional way
+        <script>
+            document.getElementById('chatForm').onsubmit = async function (event) {
+                event.preventDefault(); // Prevent the form from submitting in the traditional way
 
-            const userInputField = document.getElementById('userInput');
-            const chatBox = document.getElementById('chat');
-            const loadingSpinner = document.getElementById('loading');
-            const userInput = userInputField.value;
+                const userInputField = document.getElementById('userInput');
+                const chatBox = document.getElementById('chat');
+                const loadingSpinner = document.getElementById('loading');
+                const userInput = userInputField.value;
 
-            // Display user's question in the chat box
-            const userMsg = document.createElement('p');
-            userMsg.textContent = userInput;
-            userMsg.className = 'user';
-            chatBox.appendChild(userMsg);
+                // Display user's question in the chat box
+                const userMsg = document.createElement('p');
+                userMsg.textContent = userInput;
+                userMsg.className = 'user';
+                chatBox.appendChild(userMsg);
 
-            // Show the loading spinner
-            loadingSpinner.style.display = 'block';
+                // Show the loading spinner
+                loadingSpinner.style.display = 'block';
 
-            // Clear the input field for the next message
-            userInputField.value = '';
+                // Clear the input field for the next message
+                userInputField.value = '';
 
-            // Send the user's question to the backend using the Fetch API
-            const response = await fetch('http://0.0.0.0:8080/ask/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ question: userInput }),
-            });
+                // Send the user's question to the backend using the Fetch API
+                const response = await fetch('http://0.0.0.0:8080/ask/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ question: userInput }),
+                });
 
-            const data = await response.json();
+                const data = await response.json();
 
-            // Hide the loading spinner
-            loadingSpinner.style.display = 'none';
+                // Hide the loading spinner
+                loadingSpinner.style.display = 'none';
 
-            // Display the bot's response in the chat box
-            const botMsg = document.createElement('p');
-            botMsg.textContent = data.answer; // Assuming the backend response has an 'answer' field
-            botMsg.className = 'bot';
-            chatBox.appendChild(botMsg);
+                // Display the bot's response in the chat box
+                const botMsg = document.createElement('p');
+                botMsg.textContent = data.answer; // Assuming the backend response has an 'answer' field
+                botMsg.className = 'bot';
+                chatBox.appendChild(botMsg);
 
-            // Scroll to the bottom of the chat box to show the latest message
-            chatBox.scrollTop = chatBox.scrollHeight;
-        };
+                // Scroll to the bottom of the chat box to show the latest message
+                chatBox.scrollTop = chatBox.scrollHeight;
+            };
 
-    </script>
-
+        </script>
+    </div>
 </body>
 
 </html>
