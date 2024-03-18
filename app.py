@@ -1,3 +1,4 @@
+from operator import itemgetter
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -5,9 +6,9 @@ import uvicorn
 import logging
 
 from langchain_community.chat_models.huggingface import ChatHuggingFace
-from langchain.prompts import PromptTemplate
-from langchain_core.runnables import RunnablePassthrough
+from langchain.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
+from langchain_core.messages import HumanMessage, AIMessage
 from config import DB, RETRIEVER, LLM, POEM_DOCS, TEMPLATE
 
 
@@ -29,6 +30,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+CHAT_HISTORY = []
+
 
 class Query(BaseModel):
     question: str
@@ -42,20 +45,24 @@ def ask(query: Query) -> dict:
         logger.info("Document not found. Adding documents to the database")
         DB.add_documents(POEM_DOCS)
 
-    prompt = PromptTemplate(template=TEMPLATE, input_variables=["context", "query"])
-    logger.info(f"Prompt: {prompt.template}")
-
+    prompt = ChatPromptTemplate.from_template(TEMPLATE)
     llm = ChatHuggingFace(llm=LLM)
     chain = (
-        {"context": RETRIEVER, "question": RunnablePassthrough()}
+        {
+            "context": itemgetter("input") | RETRIEVER,
+            "chat_history": lambda x: x["chat_history"],
+            "input": itemgetter("input"),
+        }
         | prompt
         | llm
         | StrOutputParser()
     )
 
     logger.info("Running the chain")
-    answer = chain.invoke(query.question)
+    answer = chain.invoke({"input": query.question, "chat_history": CHAT_HISTORY})
     logger.info(f"Answer: {answer}")
+
+    CHAT_HISTORY.append((HumanMessage(query.question), AIMessage(answer)))
 
     return {"answer": answer}
 

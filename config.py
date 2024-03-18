@@ -23,4 +23,14 @@ RETRIEVER = DB.as_retriever(
 )
 
 
-TEMPLATE = """ <s>[INST] The lithuanian folk poem 'Du gaideliai' goes as follows. ONLY cite it in full if asked EXPLICITLY:\n{context} [/INST]  </s> [INST] Answer the question: {question} [/INST] """  # noqa
+TEMPLATE = """
+<s>[INST]
+The lithuanian folk poem 'Du gaideliai' goes as follows. Cite it in full if asked:
+{context}
+[/INST] </s>
+[INST] Answer the question based on the chat history:
+{chat_history}
+[/INST]
+[INST]
+{input}
+[/INST] """
