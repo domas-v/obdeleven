@@ -1,5 +1,6 @@
 from operator import itemgetter
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import uvicorn
@@ -17,10 +18,6 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
-origins = [
-    "http://localhost:8000",
-    "http://127.0.0.1:8000",
-]
 
 app.add_middleware(
     CORSMiddleware,
@@ -38,7 +35,7 @@ class Query(BaseModel):
 
 
 @app.post("/ask/")
-def ask(query: Query) -> dict:
+def ask(query: Query) -> dict[str, str]:
     logger.info(f"Question: {query.question}")
 
     if DB._collection.count() == 0:
@@ -66,6 +63,8 @@ def ask(query: Query) -> dict:
 
     return {"answer": answer}
 
+
+app.mount("/", StaticFiles(directory="static", html=True), name="static")
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8080)

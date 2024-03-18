@@ -161,7 +161,7 @@
                 userInputField.value = '';
 
                 // Send the user's question to the backend using the Fetch API
-                const response = await fetch('http://0.0.0.0:8080/ask/', {
+                const response = await fetch('http://localhost:8080/ask/', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
