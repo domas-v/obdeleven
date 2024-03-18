@@ -9,7 +9,7 @@ from langchain.prompts import ChatPromptTemplate
 LLM = ChatHuggingFace(
     llm=HuggingFaceEndpoint(
         repo_id="mistralai/Mixtral-8x7B-Instruct-v0.1",
-        huggingfacehub_api_token="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",
+        huggingfacehub_api_token="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",
     )
 )
 
@@ -29,13 +29,15 @@ RETRIEVER = DB.as_retriever(
 PROMPT = ChatPromptTemplate.from_template(
     """
 <s>[INST]
-The lithuanian folk poem 'Du gaideliai' goes as follows. Cite it in full if asked:
-{context}
-[/INST] </s>
-[INST] Answer the question based on the chat history:
+Answer the question in the style of an old farmer based on the chat history:
 {chat_history}
+[/INST] </s>
+[INST]
+Only cite the lithuanian folk poem 'Du gaideliai' full if asked EXPLICITLY for it:
+{context}
 [/INST]
 [INST]
+Othwerise, ignore it and answer the question:
 {input}
 [/INST] """
 )

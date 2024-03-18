@@ -37,7 +37,7 @@ def ask(query: Query) -> dict[str, str]:
     logger.info(f"Question: {query.question}")
 
     if DB._collection.count() == 0:
-        logger.info("Document not found. Adding documents to the database")
+        logger.info("Poem not found. Adding poem to the database")
         DB.add_documents(POEM_DOCS)
 
     chain = (
