@@ -4,16 +4,19 @@ from langchain_community.chat_models.huggingface import ChatHuggingFace
 from langchain_community.document_loaders import TextLoader
 from langchain.vectorstores.chroma import Chroma
 from langchain.prompts import ChatPromptTemplate
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.runnables import RunnablePassthrough
+from operator import itemgetter
 
 
 LLM = ChatHuggingFace(
     llm=HuggingFaceEndpoint(
         repo_id="mistralai/Mixtral-8x7B-Instruct-v0.1",
-        huggingfacehub_api_token="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",
+        huggingfacehub_api_token="",
     )
 )
 
-POEM_DOCS = TextLoader("./poem.txt").load()
+POEM = TextLoader("./poem.txt").load()
 DB = Chroma(
     persist_directory="./chroma",
     embedding_function=HuggingFaceHubEmbeddings(
@@ -40,4 +43,14 @@ Recite the lithuanian folk poem 'Du gaideliai' fully if asked either in english 
 Othwerise, ignore it and answer the question:
 {input}
 [/INST] """
+)
+
+CHAIN = (
+    {
+        "context": itemgetter("input") | RETRIEVER,
+        "chat_history": lambda x: x["chat_history"],
+        "input": itemgetter("input"),
+    }
+    | RunnablePassthrough.assign(context=itemgetter("context"))
+    | {"response": PROMPT | LLM | StrOutputParser(), "context": itemgetter("context")}
 )

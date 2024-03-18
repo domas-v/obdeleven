@@ -1,4 +1,3 @@
-from operator import itemgetter
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
@@ -6,9 +5,8 @@ from pydantic import BaseModel
 import uvicorn
 import logging
 
-from langchain_core.output_parsers import StrOutputParser
 from langchain_core.messages import HumanMessage, AIMessage
-from config import DB, PROMPT, RETRIEVER, LLM, POEM_DOCS
+from config import DB, CHAIN, POEM
 
 
 logging.basicConfig(level=logging.INFO)
@@ -38,21 +36,10 @@ def ask(query: Query) -> dict[str, str]:
 
     if DB._collection.count() == 0:
         logger.info("Poem not found. Adding poem to the database")
-        DB.add_documents(POEM_DOCS)
-
-    chain = (
-        {
-            "context": itemgetter("input") | RETRIEVER,
-            "chat_history": lambda x: x["chat_history"],
-            "input": itemgetter("input"),
-        }
-        | PROMPT
-        | LLM
-        | StrOutputParser()
-    )
+        DB.add_documents(POEM)
 
     logger.info("Running the chain")
-    answer = chain.invoke({"input": query.question, "chat_history": CHAT_HISTORY})
+    answer = CHAIN.invoke({"input": query.question, "chat_history": CHAT_HISTORY})
     logger.info(f"Answer: {answer}")
 
     CHAT_HISTORY.append((HumanMessage(query.question), AIMessage(answer)))
