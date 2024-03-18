@@ -40,11 +40,10 @@ def ask(query: Query) -> dict[str, str]:
 
     logger.info("Running the chain")
     answer = CHAIN.invoke({"input": query.question, "chat_history": CHAT_HISTORY})
-    logger.info(f"Answer: {answer}")
 
-    CHAT_HISTORY.append((HumanMessage(query.question), AIMessage(answer)))
+    CHAT_HISTORY.append((HumanMessage(query.question), AIMessage(answer["response"])))
 
-    return {"answer": answer}
+    return {"answer": answer["response"]}
 
 
 app.mount("/", StaticFiles(directory="static", html=True), name="static")

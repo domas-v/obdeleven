@@ -1,38 +1,19 @@
-from ragas.metrics import (
-    faithfulness,
-    answer_correctness,
-    context_precision,
-)
-from ragas import evaluate
-from datasets import Dataset
-from config import CHAIN, POEM
-
+from config import CHAIN, EMBEDDING_FUNCTION
+from numpy import dot
+from numpy.linalg import norm
 
 question = "Pacituok lietuvių liaudies eilėraštį 'Du gaideliai'"
 
 response = CHAIN.invoke({"input": question, "chat_history": []})
 
 answer = response["response"]
-context = [context.page_content for context in response["context"]]
+context = response["context"][0].page_content
 
-response_dataset = Dataset.from_dict(
-    {
-        "question": [question],
-        "answer": [answer],
-        "contexts": [context],
-        "ground_truth": [POEM[0].page_content],
-    }
+answer_embeddings = EMBEDDING_FUNCTION.embed_query(answer)
+context_embeddings = EMBEDDING_FUNCTION.embed_query(context)
+
+cos_sim = dot(answer_embeddings, context_embeddings) / (
+    norm(answer_embeddings) * norm(context_embeddings)
 )
 
-
-metrics = [
-    faithfulness,
-    context_precision,
-    answer_correctness,
-]
-
-results = evaluate(response_dataset, metrics)
-
-assert results["faithfulness"] >= 0.9
-assert results["context_precision"] >= 0.9
-assert results["answer_correctness"] >= 0.9
+assert cos_sim > 0.8

@@ -17,12 +17,10 @@ LLM = ChatHuggingFace(
 )
 
 POEM = TextLoader("./poem.txt").load()
-DB = Chroma(
-    persist_directory="./chroma",
-    embedding_function=HuggingFaceHubEmbeddings(
-        model="sentence-transformers/all-mpnet-base-v2"
-    ),
+EMBEDDING_FUNCTION = HuggingFaceHubEmbeddings(
+    model="sentence-transformers/all-mpnet-base-v2"
 )
+DB = Chroma(persist_directory="./chroma", embedding_function=EMBEDDING_FUNCTION)
 
 RETRIEVER = DB.as_retriever(
     search_type="similarity_score_threshold",

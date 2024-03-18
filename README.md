@@ -14,3 +14,14 @@ docker run -p 8080:800 --name chatbot -d chatbot
 ```
 
 You should be able to access the chatbot at `http://localhost:8080`
+
+# Evaluation
+
+The chatbot is evaluated using the `eval.py` script.
+It uses a simple cosine similarity check to see if the response to the question `Pacituok lietuvių liaudies eilėraštį 'Du gaideliai'` is similar to the expected response.
+
+To run it:
+
+```bash
+docker exec -it chatbot python /app/eval.py
+```
