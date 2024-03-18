@@ -1,12 +1,16 @@
 from langchain_community.embeddings.huggingface_hub import HuggingFaceHubEmbeddings
 from langchain_community.llms.huggingface_endpoint import HuggingFaceEndpoint
+from langchain_community.chat_models.huggingface import ChatHuggingFace
 from langchain_community.document_loaders import TextLoader
 from langchain.vectorstores.chroma import Chroma
+from langchain.prompts import ChatPromptTemplate
 
 
-LLM = HuggingFaceEndpoint(
-    repo_id="mistralai/Mixtral-8x7B-Instruct-v0.1",
-    huggingfacehub_api_token="",
+LLM = ChatHuggingFace(
+    llm=HuggingFaceEndpoint(
+        repo_id="mistralai/Mixtral-8x7B-Instruct-v0.1",
+        huggingfacehub_api_token="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",
+    )
 )
 
 POEM_DOCS = TextLoader("./poem.txt").load()
@@ -19,11 +23,11 @@ DB = Chroma(
 
 RETRIEVER = DB.as_retriever(
     search_type="similarity_score_threshold",
-    search_kwargs={"score_threshold": 0.4, "k": 1},
+    search_kwargs={"score_threshold": 0.3, "k": 1},
 )
 
-
-TEMPLATE = """
+PROMPT = ChatPromptTemplate.from_template(
+    """
 <s>[INST]
 The lithuanian folk poem 'Du gaideliai' goes as follows. Cite it in full if asked:
 {context}
@@ -34,3 +38,4 @@ The lithuanian folk poem 'Du gaideliai' goes as follows. Cite it in full if aske
 [INST]
 {input}
 [/INST] """
+)

@@ -6,11 +6,9 @@ from pydantic import BaseModel
 import uvicorn
 import logging
 
-from langchain_community.chat_models.huggingface import ChatHuggingFace
-from langchain.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.messages import HumanMessage, AIMessage
-from config import DB, RETRIEVER, LLM, POEM_DOCS, TEMPLATE
+from config import DB, PROMPT, RETRIEVER, LLM, POEM_DOCS
 
 
 logging.basicConfig(level=logging.INFO)
@@ -42,16 +40,14 @@ def ask(query: Query) -> dict[str, str]:
         logger.info("Document not found. Adding documents to the database")
         DB.add_documents(POEM_DOCS)
 
-    prompt = ChatPromptTemplate.from_template(TEMPLATE)
-    llm = ChatHuggingFace(llm=LLM)
     chain = (
         {
             "context": itemgetter("input") | RETRIEVER,
             "chat_history": lambda x: x["chat_history"],
             "input": itemgetter("input"),
         }
-        | prompt
-        | llm
+        | PROMPT
+        | LLM
         | StrOutputParser()
     )
 
