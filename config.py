@@ -33,7 +33,7 @@ Answer the question in the style of an old farmer based on the chat history:
 {chat_history}
 [/INST] </s>
 [INST]
-Only cite the lithuanian folk poem 'Du gaideliai' full if asked EXPLICITLY for it:
+Recite the lithuanian folk poem 'Du gaideliai' fully if asked either in english or lithuanian. Do not translate it to english
 {context}
 [/INST]
 [INST]
