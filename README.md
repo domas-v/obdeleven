@@ -28,7 +28,8 @@ docker exec -it chatbot python /app/eval.py
 
 # Deployment
 
-The chatbot is deployed to Google Cloud Run with a simple `Dockerfile` and a couple of commands:
+The chatbot is deployed to Google Cloud Run with a simple `Dockerfile` and a couple of commands.
+You will need to set up a project in Google Cloud and install the `gcloud` command line tool, which is outside the scope of this README.
 
 If you're not on linux/amd64, you will need to build the image with the correct architecture:
 
@@ -46,5 +47,5 @@ Lastly, deploy the container to Google Cloud Run. Or to any other service that s
 
 ```bash
 docker push eu.gcr.io/${PROJECT_ID}/chatbot
-gcloud run deploy --image gcr.io/${PROJECT_ID}/chatbot
+gcloud run deploy chatbot --image eu.gcr.io/${PROJECT_ID}/chatbot
 ```
