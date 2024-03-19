@@ -1,3 +1,4 @@
+import os
 from langchain_community.embeddings.huggingface_hub import HuggingFaceHubEmbeddings
 from langchain_community.llms.huggingface_endpoint import HuggingFaceEndpoint
 from langchain_community.chat_models.huggingface import ChatHuggingFace
@@ -12,7 +13,7 @@ from operator import itemgetter
 LLM = ChatHuggingFace(
     llm=HuggingFaceEndpoint(
         repo_id="mistralai/Mixtral-8x7B-Instruct-v0.1",
-        huggingfacehub_api_token="",
+        huggingfacehub_api_token=os.environ.get("HUGGINGFACE_API_TOKEN"),
     )
 )
 
